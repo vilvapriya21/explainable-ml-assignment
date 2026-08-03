@@ -3,13 +3,29 @@
 import functools
 import logging
 import time
-from typing import Any, Callable, Dict, List, Optional, TypeVar
+from typing import Any, Callable, Dict, Iterator, List, Optional, TypeVar, Union
 
+import numpy as np
 import pandas as pd
+
+from src.evaluation import ModelEvaluator
+from src.trainers.base import BaseModelTrainer, ModelRegistry
+from src.trainers.sklearn_trainer import SklearnModelTrainer
 
 logger = logging.getLogger(__name__)
 
 F = TypeVar("F", bound=Callable[..., Any])
+
+__all__ = [
+    "BaseModelTrainer",
+    "ModelEvaluator",
+    "ModelRegistry",
+    "SklearnModelTrainer",
+    "batch_generator",
+    "get_high_confidence_misclassifications",
+    "measure_execution_time",
+    "validate_dataframe",
+]
 
 
 def get_high_confidence_misclassifications(
@@ -102,3 +118,42 @@ def validate_dataframe(
         return wrapper  
 
     return decorator
+
+
+def batch_generator(
+    data: Union[List[Any], np.ndarray, pd.DataFrame],
+    batch_size: int,
+) -> Iterator[Union[List[Any], np.ndarray, pd.DataFrame]]:
+    """Yield data in consecutively sized batches.
+
+    Args:
+        data: A list, NumPy array, or pandas DataFrame to batch.
+        batch_size: The positive number of items or rows per batch.
+
+    Yields:
+        Consecutive slices of data, with the final batch containing any
+        remaining items or rows.
+
+    Raises:
+        ValueError: If batch_size is not a positive integer.
+        TypeError: If data is not a list, NumPy array, or pandas DataFrame.
+    """
+    if not isinstance(batch_size, int) or isinstance(batch_size, bool):
+        raise ValueError(
+            f"batch_size must be a positive integer, got {batch_size!r}."
+        )
+
+    if batch_size <= 0:
+        raise ValueError(f"batch_size must be a positive integer, got {batch_size}.")
+
+    if not isinstance(data, (list, np.ndarray, pd.DataFrame)):
+        raise TypeError(
+            "data must be a list, NumPy ndarray, or pandas DataFrame, "
+            f"got {type(data).__name__}."
+        )
+
+    for start in range(0, len(data), batch_size):
+        if isinstance(data, pd.DataFrame):
+            yield data.iloc[start : start + batch_size]
+        else:
+            yield data[start : start + batch_size]

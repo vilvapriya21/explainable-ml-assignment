@@ -1,8 +1,13 @@
 """Unit tests for src/python_advanced.py."""
 
+import inspect
+
+import numpy as np
 import pandas as pd
+import pytest
 
 from src.python_advanced import (
+    batch_generator,
     get_high_confidence_misclassifications,
     measure_execution_time,
     validate_dataframe,
@@ -127,3 +132,58 @@ def test_validate_dataframe_preserves_metadata() -> None:
 
     assert documented.__name__ == "documented"
     assert documented.__doc__ == "Docstring to preserve."
+
+
+def test_batch_generator_yields_evenly_divided_list_batches() -> None:
+    result = list(batch_generator([1, 2, 3, 4], batch_size=2))
+
+    assert result == [[1, 2], [3, 4]]
+
+
+def test_batch_generator_yields_final_incomplete_list_batch() -> None:
+    result = list(batch_generator([1, 2, 3, 4, 5], batch_size=2))
+
+    assert result == [[1, 2], [3, 4], [5]]
+
+
+def test_batch_generator_yields_numpy_array_slices() -> None:
+    result = list(batch_generator(np.array([1, 2, 3]), batch_size=2))
+
+    assert all(isinstance(batch, np.ndarray) for batch in result)
+    assert np.array_equal(result[0], np.array([1, 2]))
+    assert np.array_equal(result[1], np.array([3]))
+
+
+def test_batch_generator_yields_dataframe_slices() -> None:
+    dataframe = pd.DataFrame({"value": [1, 2, 3]})
+    result = list(batch_generator(dataframe, batch_size=2))
+
+    assert all(isinstance(batch, pd.DataFrame) for batch in result)
+    assert result[0].equals(dataframe.iloc[:2])
+    assert result[1].equals(dataframe.iloc[2:])
+
+
+def test_batch_generator_rejects_zero_batch_size() -> None:
+    with pytest.raises(ValueError, match="positive integer"):
+        list(batch_generator([1, 2], batch_size=0))
+
+
+def test_batch_generator_rejects_negative_batch_size() -> None:
+    with pytest.raises(ValueError, match="positive integer"):
+        list(batch_generator([1, 2], batch_size=-1))
+
+
+def test_batch_generator_rejects_non_integer_batch_size() -> None:
+    with pytest.raises(ValueError, match="positive integer"):
+        list(batch_generator([1, 2], batch_size=2.5))
+
+
+def test_batch_generator_rejects_unsupported_data_type() -> None:
+    with pytest.raises(TypeError, match="list, NumPy ndarray, or pandas DataFrame"):
+        list(batch_generator({"value": 1}, batch_size=1))
+
+
+def test_batch_generator_returns_a_generator() -> None:
+    result = batch_generator([1, 2], batch_size=1)
+
+    assert inspect.isgenerator(result)

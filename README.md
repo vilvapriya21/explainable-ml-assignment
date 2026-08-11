@@ -39,9 +39,15 @@ Python 3.11 is required.
        python -m venv venv
        .\venv\Scripts\Activate.ps1
 
-3. Install dependencies:
+3. Install dependencies. Choose one option:
+
+   Runtime/API and Docker only:
 
        pip install -r requirements.txt
+
+   Full local development, including notebooks and tests:
+
+       pip install -r requirements-dev.txt
 
 4. Copy the environment template:
 

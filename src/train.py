@@ -1,7 +1,10 @@
 """Containerized equivalent of notebook 03's selected-model training steps.
 
 Notebooks are not intended to execute inside a container, so this module
-recreates the selected pipeline for Docker and CI artifact generation.
+recreates the selected pipeline for Docker and CI artifact generation. When a
+notebook comparison artifact already exists, the trainer merges its refreshed
+XGBoost metrics instead of replacing the comparison so Docker can rerun
+independently without destroying the reference comparison from notebook 03.
 """
 
 import logging
@@ -24,7 +27,7 @@ from src.config import (
     RANDOM_SEED,
 )
 from src.evaluation import ModelEvaluator
-from src.utils.io import save_json
+from src.utils.io import load_json, save_json
 from src.utils.logger import configure_logging
 
 logger = logging.getLogger(__name__)
@@ -34,6 +37,8 @@ XGB_N_ESTIMATORS = 200
 XGB_MAX_DEPTH = 5
 XGB_LEARNING_RATE = 0.1
 XGB_SUBSAMPLE = 0.8
+MODEL_NAME = "XGBoost"
+NOTEBOOK_MODEL_NAME = "XGBoost (tuned)"
 
 
 def build_selected_pipeline() -> Pipeline:
@@ -62,6 +67,56 @@ def build_selected_pipeline() -> Pipeline:
     )
 
 
+def _merged_metrics(existing_metrics: dict, metrics: dict) -> dict:
+    """Update the retrained model while preserving comparison metadata.
+
+    Args:
+        existing_metrics: Existing metrics artifact content.
+        metrics: Fresh metrics from the retrained XGBoost pipeline.
+
+    Returns:
+        The existing artifact with only the corresponding XGBoost metrics
+        updated.
+    """
+    merged_metrics = existing_metrics.copy()
+    if MODEL_NAME in merged_metrics:
+        merged_metrics[MODEL_NAME] = metrics
+        return merged_metrics
+
+    comparison = merged_metrics.get("comparison")
+    if isinstance(comparison, list):
+        for index, record in enumerate(comparison):
+            if isinstance(record, dict) and record.get("model") == NOTEBOOK_MODEL_NAME:
+                updated_record = record.copy()
+                updated_record.update(metrics)
+                comparison[index] = updated_record
+                return merged_metrics
+
+    merged_metrics[MODEL_NAME] = metrics
+    return merged_metrics
+
+
+def _metrics_payload(metrics: dict) -> dict:
+    """Build the artifact payload without replacing an existing comparison.
+
+    Args:
+        metrics: Fresh metrics from the retrained XGBoost pipeline.
+
+    Returns:
+        A merged comparison artifact or a clearly marked single-model artifact.
+    """
+    if Path(METRICS_PATH).is_file():
+        return _merged_metrics(load_json(METRICS_PATH), metrics)
+    return {
+        MODEL_NAME: metrics,
+        "selected_model": MODEL_NAME,
+        "selection_reason": (
+            "Single-model trainer-service run; this artifact is not a full "
+            "notebook 03 comparison."
+        ),
+    }
+
+
 def main() -> None:
     """Train the selected pipeline and persist model and metric artifacts."""
     configure_logging()
@@ -85,17 +140,7 @@ def main() -> None:
 
     Path(ARTIFACTS_DIR).mkdir(parents=True, exist_ok=True)
     joblib.dump(pipeline, MODEL_PATH)
-    save_json(
-        {
-            "XGBoost": metrics,
-            "selected_model": "XGBoost",
-            "selection_reason": (
-                "Selected notebook 03 XGBoost configuration retrained for the "
-                "containerized evaluation workflow."
-            ),
-        },
-        METRICS_PATH,
-    )
+    save_json(_metrics_payload(metrics), METRICS_PATH)
     logger.info("Saved trained pipeline to %s and metrics to %s.", MODEL_PATH, METRICS_PATH)
 
 

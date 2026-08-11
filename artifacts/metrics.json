@@ -1,0 +1,22 @@
+{
+  "XGBoost": {
+    "accuracy": 0.972027972027972,
+    "precision": 0.9574468085106383,
+    "recall": 1.0,
+    "f1": 0.9782608695652174,
+    "confusion_matrix": [
+      [
+        49,
+        4
+      ],
+      [
+        0,
+        90
+      ]
+    ],
+    "business_cost": 4.0,
+    "roc_auc": 0.9962264150943396
+  },
+  "selected_model": "XGBoost",
+  "selection_reason": "Selected notebook 03 XGBoost configuration retrained for the containerized evaluation workflow."
+}

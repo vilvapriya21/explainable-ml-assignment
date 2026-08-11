@@ -1,1 +1,24 @@
+# Verify with: docker compose up --build
+# Success: trainer exits 0 after writing artifacts, api remains running, and
+# curl http://localhost:8000/health returns model_loaded: true.
 
+services:
+  trainer:
+    build: .
+    command: ["python", "-m", "src.train"]
+    volumes:
+      - model-artifacts:/app/artifacts
+
+  api:
+    build: .
+    command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - model-artifacts:/app/artifacts
+    ports:
+      - "8000:8000"
+    depends_on:
+      trainer:
+        condition: service_completed_successfully
+
+volumes:
+  model-artifacts:

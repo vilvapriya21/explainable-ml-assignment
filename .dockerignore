@@ -1,1 +1,16 @@
-
+notebooks/
+tests/
+docs/
+.git/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+cloud/
+README.md
+*.md
+venv/
+.venv/
+artifacts/
+.mypy_cache/
+.ruff_cache/

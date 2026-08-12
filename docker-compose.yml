@@ -5,12 +5,14 @@
 services:
   trainer:
     build: .
+    image: explainable-ml-assignment:latest
+    user: root
     command: ["python", "-m", "src.train"]
     volumes:
       - model-artifacts:/app/artifacts
 
   api:
-    build: .
+    image: explainable-ml-assignment:latest
     command: ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
       - model-artifacts:/app/artifacts

@@ -4,15 +4,25 @@ import logging
 
 from crewai import Agent
 
+from src.agent.llm import build_review_llm
 from src.agent.tools import (
-    compute_weighted_business_cost,
-    get_model_recommendation_tool,
-    read_explainability_summaries,
-    read_metrics_file,
+    audit_model_comparison,
 )
 from src.config import AGENT_MAX_ITER
 
 logger = logging.getLogger(__name__)
+
+
+def _build_agent(**kwargs: object) -> Agent:
+    """Create an agent with the explicitly configured non-OpenAI LLM.
+
+    Args:
+        **kwargs: CrewAI agent configuration values.
+
+    Returns:
+        An agent using the selected local LLM provider.
+    """
+    return Agent(llm=build_review_llm(), **kwargs)
 
 
 def build_metrics_analyst_agent() -> Agent:
@@ -21,7 +31,7 @@ def build_metrics_analyst_agent() -> Agent:
     Returns:
         A configured Metrics Analyst agent.
     """
-    return Agent(
+    return _build_agent(
         role="Metrics Analyst",
         goal=(
             "Read metrics.json, validate every model's required metrics, compare "
@@ -32,7 +42,7 @@ def build_metrics_analyst_agent() -> Agent:
             "raw confusion matrices. You identify discrepancies and explain "
             "performance trade-offs using evidence from artifacts."
         ),
-        tools=[read_metrics_file, compute_weighted_business_cost],
+        tools=[audit_model_comparison],
         verbose=True,
         max_iter=AGENT_MAX_ITER,
         allow_delegation=False,
@@ -45,7 +55,7 @@ def build_explainability_reviewer_agent() -> Agent:
     Returns:
         A configured Explainability Reviewer agent.
     """
-    return Agent(
+    return _build_agent(
         role="Explainability Reviewer",
         goal=(
             "Read SHAP and LIME summaries, identify influential features, review "
@@ -56,7 +66,7 @@ def build_explainability_reviewer_agent() -> Agent:
             "global evidence agree. You report feature-level reliability concerns "
             "without treating learned associations as causal facts."
         ),
-        tools=[read_explainability_summaries],
+        tools=[],
         verbose=True,
         max_iter=AGENT_MAX_ITER,
         allow_delegation=False,
@@ -69,7 +79,7 @@ def build_recommendation_agent() -> Agent:
     Returns:
         A configured Recommendation Agent.
     """
-    return Agent(
+    return _build_agent(
         role="Recommendation Agent",
         goal=(
             "Combine metrics and explainability findings, recommend one model, "
@@ -81,7 +91,7 @@ def build_recommendation_agent() -> Agent:
             "explainability findings into clear operational guidance. You prioritize "
             "business constraints and transparent risks over unsupported claims."
         ),
-        tools=[get_model_recommendation_tool],
+        tools=[],
         verbose=True,
         max_iter=AGENT_MAX_ITER,
         allow_delegation=False,

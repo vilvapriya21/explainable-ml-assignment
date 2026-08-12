@@ -60,12 +60,13 @@ def test_train_preserves_existing_comparison_entries(monkeypatch, tmp_path) -> N
     )
     monkeypatch.setattr(
         train,
-        "train_test_split",
+        "stratified_split_with_missing_validation_copy",
         lambda *args, **kwargs: (
             np.zeros((2, 2)),
             np.zeros((2, 2)),
             np.array([0, 1]),
             np.array([0, 1]),
+            np.array([[np.nan, 0.0], [0.0, 0.0]]),
         ),
     )
     monkeypatch.setattr(train, "build_selected_pipeline", _FakePipeline)

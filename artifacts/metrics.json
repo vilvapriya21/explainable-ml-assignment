@@ -1,22 +1,81 @@
 {
-  "XGBoost": {
-    "accuracy": 0.972027972027972,
-    "precision": 0.9574468085106383,
-    "recall": 1.0,
-    "f1": 0.9782608695652174,
-    "confusion_matrix": [
-      [
-        49,
-        4
+  "selected_model": "XGBoost (tuned)",
+  "selection_reason": "Selected for F1=0.978 and business cost=4.0; highest accuracy belongs to XGBoost (tuned).",
+  "comparison": [
+    {
+      "model": "XGBoost (tuned)",
+      "cv_f1": "0.976 \u00b1 0.012",
+      "cv_f1_mean": 0.9759593254,
+      "cv_f1_std": 0.0121670164,
+      "train_f1": 1.0,
+      "accuracy": 0.972027972,
+      "precision": 0.9574468085,
+      "recall": 1.0,
+      "f1": 0.9782608696,
+      "confusion_matrix": [
+        [
+          49,
+          4
+        ],
+        [
+          0,
+          90
+        ]
       ],
-      [
-        0,
-        90
-      ]
-    ],
-    "business_cost": 4.0,
-    "roc_auc": 0.9962264150943396
-  },
-  "selected_model": "XGBoost",
-  "selection_reason": "Selected notebook 03 XGBoost configuration retrained for the containerized evaluation workflow."
+      "roc_auc": 0.9962264151,
+      "training_time_seconds": 0.1065958003,
+      "prediction_time_seconds": 0.0027806005,
+      "business_cost": 4
+    },
+    {
+      "model": "LightGBM (tuned)",
+      "cv_f1": "0.974 \u00b1 0.016",
+      "cv_f1_mean": 0.9739040135,
+      "cv_f1_std": 0.0159912284,
+      "train_f1": 1.0,
+      "accuracy": 0.972027972,
+      "precision": 0.9673913043,
+      "recall": 0.9888888889,
+      "f1": 0.978021978,
+      "confusion_matrix": [
+        [
+          50,
+          3
+        ],
+        [
+          1,
+          89
+        ]
+      ],
+      "roc_auc": 0.9911949686,
+      "training_time_seconds": 0.0918641998,
+      "prediction_time_seconds": 0.0035869004,
+      "business_cost": 8
+    },
+    {
+      "model": "Random Forest baseline",
+      "cv_f1": "Not tuned",
+      "cv_f1_mean": null,
+      "cv_f1_std": null,
+      "train_f1": 1.0,
+      "accuracy": 0.958041958,
+      "precision": 0.9565217391,
+      "recall": 0.9777777778,
+      "f1": 0.967032967,
+      "confusion_matrix": [
+        [
+          49,
+          4
+        ],
+        [
+          2,
+          88
+        ]
+      ],
+      "roc_auc": 0.9949685535,
+      "training_time_seconds": 0.2692032,
+      "prediction_time_seconds": 0.0105601,
+      "business_cost": 14
+    }
+  ]
 }

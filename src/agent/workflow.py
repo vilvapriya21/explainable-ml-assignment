@@ -76,6 +76,7 @@ def _build_crew(max_crew_iterations: int) -> Tuple[Any, Any]:
         build_metrics_analysis_task,
         build_recommendation_task,
     )
+    from src.agent.tools import read_explainability_summaries
 
     metrics_agent = build_metrics_analyst_agent()
     explainability_agent = build_explainability_reviewer_agent()
@@ -84,7 +85,14 @@ def _build_crew(max_crew_iterations: int) -> Tuple[Any, Any]:
         agent.max_iter = max_crew_iterations
 
     metrics_task = build_metrics_analysis_task(metrics_agent)
-    explainability_task = build_explainability_review_task(explainability_agent)
+    explainability_evidence = read_explainability_summaries.func(
+        shap_path="artifacts/shap_summary.json",
+        lime_path="artifacts/lime_summary.json",
+    )
+    explainability_task = build_explainability_review_task(
+        explainability_agent,
+        explainability_evidence,
+    )
     recommendation_task = build_recommendation_task(recommendation_agent)
     recommendation_task.context = [metrics_task, explainability_task]
     crew = Crew(
@@ -140,7 +148,29 @@ def _markdown_output(result: Any) -> str:
     markdown = str(text).strip()
     if not markdown:
         raise ValueError("Crew returned empty recommendation output.")
+    duplicate_marker = "\n## artifacts/model_review.md"
+    if duplicate_marker in markdown:
+        markdown = markdown.split(duplicate_marker, maxsplit=1)[0].rstrip()
     return markdown
+
+
+def _assert_no_agent_iteration_limit(result: Any) -> None:
+    """Reject a crew result when an agent did not complete its assigned work.
+
+    Args:
+        result: Crew kickoff result, including any individual task outputs.
+
+    Raises:
+        ValueError: If a task stopped because its iteration or time limit was met.
+    """
+    task_outputs = getattr(result, "tasks_output", [])
+    output_texts = [str(getattr(output, "raw", output)) for output in task_outputs]
+    output_texts.append(str(getattr(result, "raw", result)))
+    if any("stopped due to iteration limit or time limit" in text.lower() for text in output_texts):
+        raise ValueError(
+            "A CrewAI agent reached its iteration limit before completing its task; "
+            "no model review was written."
+        )
 
 
 def _recommended_model(markdown: str) -> str:
@@ -213,6 +243,7 @@ def run_model_review(
             logger.error("Model review crew %s after %s seconds.", reason, _DEFAULT_TIMEOUT_SECONDS)
             return _failure(reason)
 
+        _assert_no_agent_iteration_limit(result)
         markdown = _markdown_output(result)
         recommended_model = _recommended_model(markdown)
         destination = Path(output_path)

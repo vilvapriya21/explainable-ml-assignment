@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from src.agent import workflow
 
 
@@ -67,3 +69,27 @@ def test_run_model_review_writes_mocked_crew_output(tmp_path, monkeypatch) -> No
         "recommended_model": "Mock Model",
     }
     assert output_path.read_text(encoding="utf-8").startswith("## Recommendation")
+
+
+def test_iteration_limited_agent_output_is_rejected() -> None:
+    """A partial CrewAI result must not be written as a model review."""
+
+    class MockTaskOutput:
+        raw = "Agent stopped due to iteration limit or time limit."
+
+    class MockResult:
+        raw = "## Recommendation\nXGBoost"
+        tasks_output = [MockTaskOutput()]
+
+    with pytest.raises(ValueError, match="reached its iteration limit"):
+        workflow._assert_no_agent_iteration_limit(MockResult())
+
+
+def test_markdown_output_removes_duplicate_file_section() -> None:
+    """Repeated fenced report content is not persisted in the final artifact."""
+    result = (
+        "## Recommendation\nXGBoost\n\n## artifacts/model_review.md\n```markdown\n"
+        "## Recommendation\nXGBoost\n```"
+    )
+
+    assert workflow._markdown_output(result) == "## Recommendation\nXGBoost"

@@ -5,8 +5,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict
 
-from crewai import tool
+from langchain_core.tools import tool
 
+from src.config import FN_COST, FP_COST
 from src.recommendation_chain import (
     BusinessConstraint,
     RecommendationRequest,
@@ -126,6 +127,44 @@ def read_metrics_file(path: str = "artifacts/metrics.json") -> dict:
     return metrics_data
 
 
+@tool("Audit Model Comparison")
+def audit_model_comparison(path: str = "artifacts/metrics.json") -> dict:
+    """Read a model comparison and independently verify every business cost.
+
+    Args:
+        path: Path to the metrics artifact.
+
+    Returns:
+        A compact per-model audit with reported and recomputed business costs.
+    """
+    metrics_data = _read_json_file(path, "Metrics")
+    _validate_metrics_artifact(metrics_data)
+    entries = _model_entries(metrics_data)
+    audit: Dict[str, Dict[str, Any]] = {}
+    for name, values in entries.items():
+        cost_check = compute_weighted_business_cost.func(
+            metrics=values,
+            fn_cost=FN_COST,
+            fp_cost=FP_COST,
+        )
+        audit[name] = {
+            "accuracy": values["accuracy"],
+            "precision": values["precision"],
+            "recall": values["recall"],
+            "f1": values["f1"],
+            "roc_auc": values["roc_auc"],
+            "confusion_matrix": values["confusion_matrix"],
+            "business_cost": values["business_cost"],
+            **cost_check,
+        }
+    logger.info("Audited %d model comparison entries from %s.", len(audit), path)
+    return {
+        "selected_model": metrics_data["selected_model"],
+        "selection_reason": metrics_data.get("selection_reason", ""),
+        "models": audit,
+    }
+
+
 @tool("Read Explainability Summaries")
 def read_explainability_summaries(
     shap_path: str = "artifacts/shap_summary.json",
@@ -164,7 +203,20 @@ def read_explainability_summaries(
             f"LIME summary is missing required keys: {sorted(lime_missing)}."
         )
     logger.info("Read validated SHAP and LIME summaries.")
-    return {"shap": shap_data, "lime": lime_data}
+    return {
+        "top_5_features": shap_data["top_5_features"],
+        "false_negative": {
+            "record_index": shap_data["local_false_negative_example"]["record_index"],
+            "true_label": shap_data["local_false_negative_example"]["true_label"],
+            "predicted_label": shap_data["local_false_negative_example"]["predicted_label"],
+            "top_shap_contributions": shap_data["local_false_negative_example"][
+                "feature_contributions"
+            ][:5],
+            "top_lime_contributions": lime_data["incorrect_example"][
+                "feature_contributions"
+            ][:5],
+        },
+    }
 
 
 @tool("Compute Weighted Business Cost")

@@ -2,6 +2,10 @@
 
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 RANDOM_SEED: int = int(os.getenv("RANDOM_SEED", "42"))
 FN_COST: float = float(os.getenv("FN_COST", "5.0"))
 FP_COST: float = float(os.getenv("FP_COST", "1.0"))
@@ -29,3 +33,8 @@ AGENT_MAX_ITER: int = int(os.getenv("AGENT_MAX_ITER", "5"))
 AGENT_TIMEOUT_SECONDS: int = int(os.getenv("AGENT_TIMEOUT_SECONDS", "300"))
 API_TITLE: str = os.getenv("API_TITLE", "Explainable ML Model Evaluation API")
 API_VERSION: str = os.getenv("API_VERSION", "1.0.0")
+LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "ollama").lower()
+GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
+GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3.2:3b")

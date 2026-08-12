@@ -1,0 +1,11 @@
+{
+  "accuracy": 0.428,
+  "macro_precision": 0.5474161255411255,
+  "macro_recall": 0.4185568086883876,
+  "macro_f1": 0.41836201079622126,
+  "checkpoint": "prajjwal1/bert-tiny",
+  "num_train_records": 1000,
+  "num_val_records": 250,
+  "max_seq_length": 64,
+  "num_epochs": 1
+}

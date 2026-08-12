@@ -13,7 +13,6 @@ from pathlib import Path
 import joblib
 from sklearn.datasets import load_breast_cancer
 from sklearn.impute import SimpleImputer
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
@@ -26,6 +25,7 @@ from src.config import (
     MODEL_PATH,
     RANDOM_SEED,
 )
+from src.data_processing import stratified_split_with_missing_validation_copy
 from src.evaluation import ModelEvaluator
 from src.utils.io import load_json, save_json
 from src.utils.logger import configure_logging
@@ -121,11 +121,9 @@ def main() -> None:
     """Train the selected pipeline and persist model and metric artifacts."""
     configure_logging()
     dataset = load_breast_cancer()
-    X_train, X_test, y_train, y_test = train_test_split(
+    X_train, X_test, y_train, y_test, _ = stratified_split_with_missing_validation_copy(
         dataset.data,
         dataset.target,
-        test_size=0.25,
-        stratify=dataset.target,
         random_state=RANDOM_SEED,
     )
     pipeline = build_selected_pipeline()

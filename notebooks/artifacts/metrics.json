@@ -1,0 +1,51 @@
+{
+  "selected_model": "XGBoost (tuned)",
+  "selection_reason": "Selected for F1=0.978 and business cost=4.0; highest accuracy belongs to XGBoost (tuned).",
+  "comparison": [
+    {
+      "model": "XGBoost (tuned)",
+      "cv_f1": "0.976 \u00b1 0.012",
+      "cv_f1_mean": 0.9759593254,
+      "cv_f1_std": 0.0121670164,
+      "train_f1": 1.0,
+      "accuracy": 0.972027972,
+      "precision": 0.9574468085,
+      "recall": 1.0,
+      "f1": 0.9782608696,
+      "roc_auc": 0.9962264151,
+      "training_time_seconds": 0.2276809998,
+      "prediction_time_seconds": 0.0036797998,
+      "business_cost": 4
+    },
+    {
+      "model": "LightGBM (tuned)",
+      "cv_f1": "0.974 \u00b1 0.016",
+      "cv_f1_mean": 0.9739040135,
+      "cv_f1_std": 0.0159912284,
+      "train_f1": 1.0,
+      "accuracy": 0.972027972,
+      "precision": 0.9673913043,
+      "recall": 0.9888888889,
+      "f1": 0.978021978,
+      "roc_auc": 0.9911949686,
+      "training_time_seconds": 0.1427381998,
+      "prediction_time_seconds": 0.0037618997,
+      "business_cost": 8
+    },
+    {
+      "model": "Random Forest baseline",
+      "cv_f1": "Not tuned",
+      "cv_f1_mean": null,
+      "cv_f1_std": null,
+      "train_f1": 1.0,
+      "accuracy": 0.958041958,
+      "precision": 0.9565217391,
+      "recall": 0.9777777778,
+      "f1": 0.967032967,
+      "roc_auc": 0.9949685535,
+      "training_time_seconds": 0.5032333001,
+      "prediction_time_seconds": 0.0233140001,
+      "business_cost": 14
+    }
+  ]
+}

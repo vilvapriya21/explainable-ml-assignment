@@ -1,0 +1,96 @@
+{
+  "correct_example": {
+    "record_index": 0,
+    "true_label": 1,
+    "predicted_label": 1,
+    "feature_contributions": [
+      {
+        "feature": "-0.75 < worst concave points <= -0.25",
+        "weight": 0.15358370474160907
+      },
+      {
+        "feature": "-0.74 < worst texture <= -0.04",
+        "weight": 0.08915193621896397
+      },
+      {
+        "feature": "-0.64 < worst area <= -0.34",
+        "weight": 0.0862783782240917
+      },
+      {
+        "feature": "-0.73 < mean concave points <= -0.41",
+        "weight": 0.07787791789393254
+      },
+      {
+        "feature": "-0.69 < worst perimeter <= -0.27",
+        "weight": 0.057917174996645206
+      },
+      {
+        "feature": "mean smoothness > 0.66",
+        "weight": -0.05355968917914988
+      },
+      {
+        "feature": "-0.70 < compactness error <= -0.29",
+        "weight": 0.04907015531581073
+      },
+      {
+        "feature": "-0.14 < worst symmetry <= 0.44",
+        "weight": -0.04327961020296783
+      },
+      {
+        "feature": "-0.25 < mean compactness <= 0.51",
+        "weight": 0.040125268850416104
+      },
+      {
+        "feature": "worst smoothness > 0.62",
+        "weight": -0.03738150156506904
+      }
+    ]
+  },
+  "incorrect_example": {
+    "record_index": 92,
+    "true_label": 1,
+    "predicted_label": 0,
+    "feature_contributions": [
+      {
+        "feature": "-0.75 < worst concave points <= -0.25",
+        "weight": -0.1260557074532284
+      },
+      {
+        "feature": "-0.74 < worst texture <= -0.04",
+        "weight": -0.09928731242995727
+      },
+      {
+        "feature": "worst symmetry <= -0.65",
+        "weight": -0.08777037760619857
+      },
+      {
+        "feature": "-0.34 < worst area <= 0.29",
+        "weight": 0.08285452096709996
+      },
+      {
+        "feature": "-0.04 < mean smoothness <= 0.66",
+        "weight": 0.07362777244418917
+      },
+      {
+        "feature": "-0.65 < symmetry error <= -0.24",
+        "weight": 0.0670574723412618
+      },
+      {
+        "feature": "mean area > 0.33",
+        "weight": 0.0525464633797281
+      },
+      {
+        "feature": "fractal dimension error <= -0.57",
+        "weight": 0.04377412110043895
+      },
+      {
+        "feature": "-0.65 < concave points error <= -0.16",
+        "weight": -0.038089753980575014
+      },
+      {
+        "feature": "-0.70 < compactness error <= -0.29",
+        "weight": -0.037487549949470046
+      }
+    ]
+  }
+}

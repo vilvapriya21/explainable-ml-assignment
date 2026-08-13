@@ -120,7 +120,7 @@ Run the full suite with:
 
     pytest
 
-The repository currently contains seven test modules and 43 collected tests.
+The repository currently contains 11 test modules and 54 collected tests.
 Use pytest -v for verbose test names and outcomes.
 
 ## Reproducing the Transformer Checkpoint

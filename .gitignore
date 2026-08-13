@@ -15,7 +15,6 @@ dist/
 
 .DS_Store
 
-artifacts/*.joblib
 artifacts/*.pt
 artifacts/*.h5
 EOF
@@ -37,6 +36,5 @@ dist/
 
 .DS_Store
 
-artifacts/*.joblib
 artifacts/*.pt
 artifacts/*.h5

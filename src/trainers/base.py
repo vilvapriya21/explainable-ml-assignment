@@ -1,26 +1,5 @@
 """Abstract interfaces and registry support for model trainers."""
 
-"""
-BaseModelTrainer is abstract because it defines the stable contract shared by
-all training backends without claiming to know how a particular model is fit,
-queried, or persisted. This prevents incomplete trainer instances from being
-created while allowing each backend to implement its own mechanics. A
-ModelRegistry uses composition rather than inheriting from BaseModelTrainer:
-it coordinates and stores trainer objects, but it is not itself a model and
-cannot meaningfully train or predict. Keeping that responsibility separate
-makes the registry useful for any compliant trainer.
-
-ModelEvaluator is also separate from a trainer because evaluation is a
-cross-cutting concern. Trainers focus on model lifecycle operations, whereas
-an evaluator can compare predictions from any trainer, saved experiment, or
-external source using a consistent set of metrics and business costs. This
-separation improves reuse and keeps each class focused on one responsibility.
-Configuration is encapsulated in private attributes. The read-only config
-property returns a newly constructed dictionary with a copied
-hyperparameter mapping, allowing callers to inspect a trainer's configuration
-without mutating the configuration that controls the trainer.
-"""
-
 import abc
 from pathlib import Path
 from typing import Any, Dict, List
@@ -30,7 +9,11 @@ class BaseModelTrainer(abc.ABC):
     """Define the common interface for model training implementations.
 
     This abstract class cannot be instantiated directly; subclasses must
-    implement all lifecycle methods.
+    implement all lifecycle methods. It defines the stable contract shared by
+    training backends without claiming to know how a particular model is fit,
+    queried, or persisted. Configuration is held in private attributes; the
+    read-only config property returns copied values so callers cannot mutate
+    the configuration controlling a trainer.
 
     Args:
         name: A descriptive name for the model.
@@ -115,7 +98,10 @@ class BaseModelTrainer(abc.ABC):
 class ModelRegistry:
     """Manage named trainer instances through composition.
 
-    The registry holds trainers without extending their training interface.
+    The registry holds trainers without extending their training interface: it
+    coordinates model objects but is not itself a model and cannot meaningfully
+    train or predict. Evaluation remains separate because it is a cross-cutting
+    concern that can compare predictions from any trainer or external source.
     """
 
     def __init__(self) -> None:
@@ -185,4 +171,5 @@ class ModelRegistry:
             The restored trainer.
         """
         trainer = self.get(name)
-        return trainer.load(str(Path(directory) / f"{name}.joblib"))
+        self._models[name] = trainer.load(str(Path(directory) / f"{name}.joblib"))
+        return self._models[name]

@@ -1,37 +1,29 @@
 # AI Usage Disclosure
 
-## Tool Used
+## Tools Used
 
-OpenAI Codex was used during this repository's development as an
-implementation and review assistant. The maintainer supplied the assessment
-requirements, scoped the requested changes, and retained responsibility for
-accepting the resulting work.
+OpenAI Codex and Claude were used as implementation and review assistants
+during development. Claude assisted with early project scaffolding, the A1-A3
+work, and iterative fix cycles. OpenAI Codex assisted with implementation,
+testing, notebook execution, dependency configuration, and Docker debugging.
 
-## What It Was Used For
+## What the Tools Assisted With
 
-- Drafting initial implementations of requested source modules from detailed
-  written specifications, including trainers, evaluation, configuration,
-  utilities, agents, API endpoints, and Docker support.
-- Drafting notebook cells for Parts B through H, including explanatory
-  markdown, runnable examples, and artifact-writing steps.
-- Drafting and updating pytest coverage for the requested functions,
-  workflows, configuration helpers, and FastAPI endpoints.
-- Drafting repository documentation, including README.md, ASSUMPTIONS.md,
-  AI_USAGE.md, architecture documentation, and the cloud deployment design.
-- Running local validation commands, interpreting failures, and adjusting
-  generated code to match installed package behavior and the saved model
-  artifact format.
+- Drafting source modules, tests, notebooks, and documentation from the
+  assessment requirements.
+- Suggesting fixes after local test, notebook, PyTorch, CrewAI, and Docker
+  failures.
+- Reviewing dependency imports and helping separate runtime dependencies from
+  notebook and test dependencies.
+- Generating candidate explanations and report wording that were checked
+  against the computed artifacts.
 
-## What Was Reviewed or Adjusted
+## Maintainer Review and Changes
 
-Every AI-generated file was checked against the assessment's stated
-requirements before being retained. Concrete adjustments during assisted
-development included aligning shared FN_COST and FP_COST configuration imports,
-supporting the saved full sklearn Pipeline artifact in the FastAPI startup
-loader, and making the Docker trainer reproduce notebook 03's selected XGBoost
-configuration rather than rerunning a tuning search.
-
-Before a final external submission, the project maintainer should add any
-additional human-specific review example that is not captured in repository
-history, such as a domain decision, test case, or wording change they made
-independently.
+The maintainer ran the local virtual environment, notebooks, Docker workflow,
+and CrewAI workflow, then reported the observed repeated tool calls, artifact
+path mismatch, and Docker trainer permission failure for correction. The
+comparison artifact verified the final cost ordering as XGBoost=4, LightGBM=8,
+and Random Forest=14, which was used to check the final model-review wording.
+The maintainer retained responsibility for selecting the environment, running
+the project, and accepting the submitted code and written conclusions.

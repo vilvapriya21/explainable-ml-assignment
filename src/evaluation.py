@@ -11,9 +11,6 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from src.trainers.base import BaseModelTrainer
-
-
 class ModelEvaluator:
     """Evaluate predictions from a trainer or another prediction source.
 

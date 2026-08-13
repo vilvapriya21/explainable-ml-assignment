@@ -5,6 +5,7 @@ from typing import Any, Dict
 
 import joblib
 
+from src.python_advanced import measure_execution_time
 from src.trainers.base import BaseModelTrainer
 
 
@@ -36,8 +37,6 @@ class SklearnModelTrainer(BaseModelTrainer):
             X: Feature data accepted by the estimator.
             y: Target values aligned with X.
         """
-        from src.python_advanced import measure_execution_time
-
         timed_fit = measure_execution_time(self._estimator.fit)
         timed_fit(X, y)
         self._is_fitted = True

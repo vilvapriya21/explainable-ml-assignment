@@ -23,8 +23,8 @@
         ]
       ],
       "roc_auc": 0.9962264151,
-      "training_time_seconds": 0.1065958003,
-      "prediction_time_seconds": 0.0027806005,
+      "training_time_seconds": 0.1873740004,
+      "prediction_time_seconds": 0.0042065,
       "business_cost": 4
     },
     {
@@ -48,8 +48,8 @@
         ]
       ],
       "roc_auc": 0.9911949686,
-      "training_time_seconds": 0.0918641998,
-      "prediction_time_seconds": 0.0035869004,
+      "training_time_seconds": 0.168327,
+      "prediction_time_seconds": 0.0097113,
       "business_cost": 8
     },
     {
@@ -73,8 +73,8 @@
         ]
       ],
       "roc_auc": 0.9949685535,
-      "training_time_seconds": 0.2692032,
-      "prediction_time_seconds": 0.0105601,
+      "training_time_seconds": 0.5329332999,
+      "prediction_time_seconds": 0.0311761,
       "business_cost": 14
     }
   ]
